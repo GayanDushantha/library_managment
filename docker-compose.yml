@@ -1,0 +1,37 @@
+services:
+  app:
+    build: .
+    container_name: library_management_app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - libraryDatabase
+    environment:
+      SPRING_DATASOURCE_URL: ${DB_URL}
+      SPRING_PROFILES_ACTIVE: ${ENVIRONMENT}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_FLYWAY_ENABLED: true
+    networks:
+      - spring-net
+
+  libraryDatabase:
+    image: postgres:15
+    container_name: postgres_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - spring-net
+
+volumes:
+  postgres_data:
+
+networks:
+  spring-net:
