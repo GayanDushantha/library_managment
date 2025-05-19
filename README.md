@@ -45,14 +45,17 @@ This is a Spring Boot backend application for managing a library system. It supp
 Ensure you have Docker and Docker Compose installed.
 
 ```bash
-mvn package
+# Build the project to generate the JAR file
+mvn clean package
+
+# Start application and dependencies using Docker Compose
 docker-compose up -d
 ```
 
 - This command will:
-  - Create Jar file in target folder
+  - Build the project and generate the JAR file inside the `target/` directory
   - Spin up a PostgreSQL database container
-  - Launch the Spring Boot application container
+  - Launch the Spring Boot application container using the generated JAR
 - The application will be accessible at: `http://localhost:8080`
 
 ### Option 2: Run without Docker
@@ -99,6 +102,19 @@ This provides detailed documentation for all available endpoints and their input
 - **Containerization:** Docker, Docker Compose  
 - **Migration Tool:** Flyway  
 - **API Docs:** Swagger / OpenAPI  
+
+---
+
+## 💡 Why PostgreSQL?
+
+PostgreSQL was chosen for the following reasons:
+
+- **Performance:** Handles large datasets and concurrent connections efficiently  
+- **Stability:** Proven track record in production environments  
+- **Advanced Features:** Supports JSON, full-text search, and complex queries  
+- **Strong community and support:** Extensive documentation and regular updates  
+- **Compatibility:** Seamlessly integrates with Spring Boot and Flyway  
+- **Open Source:** Completely free with no licensing fees
 
 ---
 
