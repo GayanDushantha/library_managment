@@ -22,7 +22,7 @@ This is a Spring Boot backend application for managing a library system. It supp
 
 ### 📥 Registration
 
-- `POST /api/v1/borrowers` – Register a new borrower  
+- `POST /api/v1/borrower` – Register a new borrower  
 - `POST /api/v1/books` – Register new books  
 
 ### 📚 Library Access
@@ -31,8 +31,8 @@ This is a Spring Boot backend application for managing a library system. It supp
 
 ### 🔄 Borrowing Actions
 
-- `POST /api/v1/borrow` – Borrow a book by its unique ID  
-- `POST /api/v1/return` – Return a previously borrowed book  
+- `POST /api/v1/borrowBook/borrow` – Borrow a book by its unique ID  
+- `POST /api/v1/borrowBook/return` – Return a previously borrowed book  
 
 > Full API documentation available via Swagger UI.
 

@@ -29,6 +29,7 @@ public class BookController {
     @GetMapping
     public ResponseEntity<BookListResponse> getAllBooks() {
         log.info("Get All Books web Started");
+
         return ResponseEntity.ok(bookService.getAllBooks());
     }
 

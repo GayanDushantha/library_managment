@@ -2,6 +2,7 @@ package com.ascendion.library.controller;
 
 import com.ascendion.library.dto.request.BorrowerRequest;
 import com.ascendion.library.dto.response.BorrowerResponse;
+import com.ascendion.library.exception.RecordAlreadyExistException;
 import com.ascendion.library.service.BorrowerService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -21,7 +22,7 @@ public class BorrowerController {
     private  final BorrowerService borrowerService;
 
     @PostMapping
-    public ResponseEntity<BorrowerResponse> createBorrower(@Valid @RequestBody BorrowerRequest borrowerRequest) {
+    public ResponseEntity<BorrowerResponse> createBorrower(@Valid @RequestBody BorrowerRequest borrowerRequest) throws RecordAlreadyExistException {
         log.info("Create borrower request: {}", borrowerRequest);
         return ResponseEntity.ok().body(borrowerService.createBorrower(borrowerRequest));
     }

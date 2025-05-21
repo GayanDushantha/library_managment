@@ -43,7 +43,7 @@ public class TestBorrowBookService {
 
     /**+
      * Test happy path for borrowBook method
-     * @throws RecordNotFoundException
+     * @throws RecordNotFoundException -
      */
     @Test
     void borrowBookShouldSucceedWhenBookAndBorrowerExistAndBookIsAvailable() throws RecordNotFoundException {
@@ -226,7 +226,7 @@ public class TestBorrowBookService {
         // Mocking Objects
         when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
         when(borrowBookRepository.findByBookIdAndBorrowerIdAndBorrowStatus(1L, 2L, BorrowStatus.BORROWED))
-                .thenReturn(List.of(bb1, bb2));
+                .thenReturn( List.of(bb1, bb2));
 
         // Calling actual methods and Testing
         assertThrows(Exception.class, () -> borrowBookService.returnBook(request));

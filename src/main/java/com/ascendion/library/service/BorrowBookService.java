@@ -20,89 +20,87 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
 @AllArgsConstructor
 public class BorrowBookService {
 
-        private final BookRepository bookRepository;
-        private final BorrowerRepository borrowerRepository;
-        private final BorrowBookRepository borrowBookRepository;
+    private final BookRepository bookRepository;
+    private final BorrowerRepository borrowerRepository;
+    private final BorrowBookRepository borrowBookRepository;
 
-        @Transactional
-        public BorrowBookResponse borrowBook(BorrowBookRequest borrowBookRequest) throws RecordNotFoundException {
-            log.info("Borrow book request: {}", borrowBookRequest);
+    @Transactional
+    public BorrowBookResponse borrowBook(BorrowBookRequest borrowBookRequest) throws RecordNotFoundException {
+        log.info("Borrow book request: {}", borrowBookRequest);
 
-            Optional<Book> bookOpt = bookRepository.findById(borrowBookRequest.bookId());
-            if (bookOpt.isPresent() && bookOpt.get().isAvailable()) {
+        try{
+            // Throw if Book not exist
+            Book book = bookRepository.findById(borrowBookRequest.bookId())
+                    .orElseThrow( () -> new RecordNotFoundException("No available Book found with id: "
+                            + borrowBookRequest.bookId()));
 
-                Optional<Borrower> borrowerOpt = borrowerRepository.findById(borrowBookRequest.borrowerId());
-                if (borrowerOpt.isPresent()) {
+            Borrower borrower = borrowerRepository.findById(borrowBookRequest.borrowerId())
+                    .orElseThrow( () -> new RecordNotFoundException("No Borrower found with id: "
+                            + borrowBookRequest.borrowerId()));
 
-                    Borrower borrower = borrowerOpt.get();
+            // Create Borrowing status
+            BorrowBook borrowBook = BorrowBook.builder()
+                    .book(book)
+                    .borrower(borrower)
+                    .borrowStatus(BorrowStatus.BORROWED)
+                    .build();
+            borrowBook = borrowBookRepository.save(borrowBook);
 
-                    // Create Borrowing status
-                    BorrowBook borrowBook = BorrowBook.builder()
-                            .book(bookOpt.get())
-                            .borrower(borrower)
-                            .borrowStatus(BorrowStatus.BORROWED)
-                            .build();
-                    borrowBook = borrowBookRepository.save(borrowBook);
+            // Update Book availability
+            book.setAvailable(false);
+            book = bookRepository.save(book);
 
-                    // Update Book availability
-                    Book book = bookOpt.get();
-                    book.setAvailable(false);
-                    book = bookRepository.save(book);
+            log.info("Book is borrowed, book Id: {} borrower id: {}", book.getId(), borrower.getId());
+            return new BorrowBookResponse("successfully borrowed",
+                    new BookResponse(book), new BorrowerResponse(borrower));
 
-                    log.info("Book is borrowed, book Id: {} borrower id: {}", book.getId(), borrower.getId());
-                    return new BorrowBookResponse("successfully borrowed",
-                            new BookResponse(book), new BorrowerResponse(borrower));
-
-                }else{
-                    throw new RecordNotFoundException("No Borrower found with id: "
-                            + borrowBookRequest.borrowerId());
-                }
-            }else{
-                throw new RecordNotFoundException("No available Book found with id: "
-                        + borrowBookRequest.bookId());
-            }
+        } catch (Exception e) {
+            log.error("Error while borrowing book for request: {}", borrowBookRequest);
+            throw e;
         }
+    }
 
-        @Transactional
-        public ReturnBookResponse returnBook(ReturnBookRequest returnBookRequest) throws Exception {
-            log.info("Return book request: {}", returnBookRequest);
+    @Transactional
+    public ReturnBookResponse returnBook(ReturnBookRequest returnBookRequest) throws Exception {
+        log.info("Return book request: {}", returnBookRequest);
 
+        try {
             // Validate book
-            Optional<Book> bookOpt = bookRepository.findById(returnBookRequest.bookId());
-            if (bookOpt.isPresent()) {
+            Book book = bookRepository.findById(returnBookRequest.bookId())
+                    .orElseThrow( ()-> new RecordNotFoundException("No Book found with id: "
+                            + returnBookRequest.bookId()));
 
-                // check for borrows
-                 List<BorrowBook> borrowedBooks = borrowBookRepository.findByBookIdAndBorrowerIdAndBorrowStatus(
-                        returnBookRequest.bookId(), returnBookRequest.borrowerId(), BorrowStatus.BORROWED);
+            // check for borrows
+             List<BorrowBook> borrowedBooks = borrowBookRepository.findByBookIdAndBorrowerIdAndBorrowStatus(
+                    returnBookRequest.bookId(), returnBookRequest.borrowerId(), BorrowStatus.BORROWED);
 
-                 if (borrowedBooks == null || borrowedBooks.isEmpty()) {
-                    throw new IllegalArgumentException("No Borrowed Book found");
-                 } else if (borrowedBooks.size() > 1) {
-                     throw new Exception("Internal server error");
-                 }
+             if (borrowedBooks == null || borrowedBooks.isEmpty()) {
+                throw new IllegalArgumentException("No Borrowed Book found");
+             } else if (borrowedBooks.size() > 1) {
+                 throw new Exception("Internal server error");
+             }
 
-                 // Update borrow
-                 BorrowBook borrowedBook = borrowedBooks.get(0);
-                 borrowedBook.setBorrowStatus(BorrowStatus.RETURNED);
-                 borrowBookRepository.save(borrowedBook);
+            // Update borrow
+            BorrowBook borrowedBook = borrowedBooks.get(0);
+            borrowedBook.setBorrowStatus(BorrowStatus.RETURNED);
+            borrowBookRepository.save(borrowedBook);
 
-                 // Update book availability
-                Book book = bookOpt.get();
-                book.setAvailable(true);
-                bookRepository.save(book);
+            // Update book availability
+            book.setAvailable(true);
+            bookRepository.save(book);
 
-                return new ReturnBookResponse("Book Returned Successfully", new BookResponse(book)
-                        , new BorrowerResponse(borrowedBook.getBorrower()));
-            }else{
-                throw new RecordNotFoundException("No Book found with id: "
-                        + returnBookRequest.bookId());
-            }
+            return new ReturnBookResponse("Book Returned Successfully", new BookResponse(book)
+                    , new BorrowerResponse(borrowedBook.getBorrower()));
+
+        } catch (Exception e) {
+            log.error("Error while returning book for request: {}", returnBookRequest);
+            throw e;
         }
+    }
 }

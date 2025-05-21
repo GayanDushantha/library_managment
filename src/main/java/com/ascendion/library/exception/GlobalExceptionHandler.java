@@ -46,10 +46,23 @@ public class GlobalExceptionHandler {
      */
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(IllegalArgumentException exception) {
-        log.error("ResourceNotFoundException Exception", exception);
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException exception) {
+        log.error("IllegalArgumentException Exception", exception);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse("BAD_REQUEST", exception.getMessage()));
+    }
+
+    /**+
+     * handler method for RecordAlreadyExistException Exceptions
+     * @param exception - RecordAlreadyExistException class
+     * @return ErrorResponse containing error details
+     */
+
+    @ExceptionHandler(RecordAlreadyExistException.class)
+    public ResponseEntity<ErrorResponse> handleRecordAlreadyExistException(RecordAlreadyExistException exception) {
+        log.error("RecordAlreadyExistException Exception", exception);
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse("RECORD_ALREADY_EXIST", exception.getMessage()));
     }
 
     /**+
@@ -59,10 +72,10 @@ public class GlobalExceptionHandler {
      */
 
     @ExceptionHandler(RecordNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(RecordNotFoundException exception) {
-        log.error("ResourceNotFoundException Exception", exception);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponse("RESOURCE_NOT_FOUND", exception.getMessage()));
+    public ResponseEntity<ErrorResponse> handleRecordNotFoundException(RecordNotFoundException exception) {
+        log.error("RecordNotFoundException Exception", exception);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse("RECORD_NOT_FOUND", exception.getMessage()));
     }
 
     /**+
@@ -72,7 +85,7 @@ public class GlobalExceptionHandler {
      */
 
     @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(NoResourceFoundException exception) {
+    public ResponseEntity<ErrorResponse> handleNoResourceFoundException(NoResourceFoundException exception) {
         log.error("NoResourceFoundException Exception", exception);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse("RESOURCE_NOT_FOUND", exception.getMessage()));

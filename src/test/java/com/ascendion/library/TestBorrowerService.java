@@ -3,6 +3,7 @@ package com.ascendion.library;
 import com.ascendion.library.dto.request.BorrowerRequest;
 import com.ascendion.library.dto.response.BorrowerResponse;
 import com.ascendion.library.entity.Borrower;
+import com.ascendion.library.exception.RecordAlreadyExistException;
 import com.ascendion.library.repository.BorrowerRepository;
 import com.ascendion.library.service.BorrowerService;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,7 @@ public class TestBorrowerService {
     BorrowerService borrowerService;
 
     @Test
-    void shouldCreateBorrowerSaveBorrowerSuccessfully() {
+    void shouldCreateBorrowerSaveBorrowerSuccessfully() throws RecordAlreadyExistException {
         log.info("Evaluate Test shouldCreateBorrowerSaveBorrowerSuccessfully");
 
         // Preparing Data
@@ -57,4 +58,20 @@ public class TestBorrowerService {
         log.info("Test passed: shouldCreateBorrowerSaveBorrowerSuccessfully");
     }
 
+    @Test
+    void shouldCreateBorrowerThrowRecordAlreadyExistException(){
+        log.info("Evaluate Test shouldCreateBorrowerThrowRecordAlreadyExistException");
+
+        // Preparing data
+        BorrowerRequest borrowerRequest = new BorrowerRequest("John", "john@gmail.com");
+
+        // Mocking Objects
+        when(borrowerRepository.existsByEmail("john@gmail.com")).thenReturn(true);
+
+        // Calling actual methods and Testing
+        assertThrows(RecordAlreadyExistException.class, () -> borrowerService.createBorrower(borrowerRequest));
+        verify(borrowerRepository, never()).save(any(Borrower.class));
+
+        log.info("Test passed: shouldCreateBorrowerThrowRecordAlreadyExistException");
+    }
 }
