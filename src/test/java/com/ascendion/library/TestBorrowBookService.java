@@ -98,7 +98,7 @@ public class TestBorrowBookService {
         when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
 
         // Calling actual methods and Testing
-        assertThrows(RecordNotFoundException.class, () -> borrowBookService.borrowBook(request));
+        assertThrows(IllegalArgumentException.class, () -> borrowBookService.borrowBook(request));
         log.info("Test passed: borrowBookShouldThrowWhenBookIsNotAvailable");
     }
 
