@@ -40,6 +40,11 @@ public class BorrowBookService {
                     .orElseThrow( () -> new RecordNotFoundException("No available Book found with id: "
                             + borrowBookRequest.bookId()));
 
+            // Check for availability
+            if (!book.isAvailable()) {
+                throw new IllegalArgumentException("Book with id " + borrowBookRequest.bookId() + " is not available for borrowing.");
+            }
+
             Borrower borrower = borrowerRepository.findById(borrowBookRequest.borrowerId())
                     .orElseThrow( () -> new RecordNotFoundException("No Borrower found with id: "
                             + borrowBookRequest.borrowerId()));
