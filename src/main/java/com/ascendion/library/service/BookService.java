@@ -48,7 +48,7 @@ public class BookService {
             // convert to BookResponse and return
             return new BookResponse(book);
         } catch (Exception e) {
-            log.error("Error creating book for: {}", bookRequest);
+            log.error("Error creating book for: {}", bookRequest, e);
             log.error(e.getMessage());
             throw e; // Delegate to Global Exception Handler.
         }
@@ -70,7 +70,7 @@ public class BookService {
             return new BookListResponse(bookResponses);
 
         } catch (Exception e) {
-            log.error("Error in getting all books");
+            log.error("Error in getting all books", e);
             throw e; // Delegate to Global Exception Handler.
         }
     }

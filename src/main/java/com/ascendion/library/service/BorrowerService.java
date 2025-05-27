@@ -37,7 +37,7 @@ public class BorrowerService {
             return new BorrowerResponse(borrower);
 
         } catch (Exception e) {
-            log.error("Error in creating new borrower for request: {}", borrowerRequest);
+            log.error("Error in creating new borrower for request: {}", borrowerRequest,e);
             throw e; // Delegate to Global Exception Handler.
         }
     }

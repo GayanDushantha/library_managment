@@ -66,7 +66,7 @@ public class BorrowBookService {
                     new BookResponse(book), new BorrowerResponse(borrower));
 
         } catch (Exception e) {
-            log.error("Error while borrowing book for request: {}", borrowBookRequest);
+            log.error("Error while borrowing book for request: {}", borrowBookRequest, e);
             throw e;
         }
     }
@@ -104,7 +104,7 @@ public class BorrowBookService {
                     , new BorrowerResponse(borrowedBook.getBorrower()));
 
         } catch (Exception e) {
-            log.error("Error while returning book for request: {}", returnBookRequest);
+            log.error("Error while returning book for request: {}", returnBookRequest, e);
             throw e;
         }
     }
